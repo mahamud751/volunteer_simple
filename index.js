@@ -18,7 +18,9 @@ async function run() {
     try {
         await client.connect()
         const database = client.db('volunteer_list')
-        const volunteerCollection = database.collection('service')
+        const volunteerCollection = database.collection('services')
+
+        const userCollection = database.collection('users')
 
         app.get('/services', async (req, res) => {
             const cursor = volunteerCollection.find({})
@@ -26,6 +28,21 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await volunteerCollection.findOne(query)
+            res.json(result)
+        })
+
+        app.post('/addUser', async (req, res) => {
+            console.log('hit the post')
+            // res.send('hit')
+            const query = req.body
+            const users = await userCollection.insertOne(query)
+            console.log(users)
+            res.json(users)
+        })
     }
     finally {
         // await client.close()
